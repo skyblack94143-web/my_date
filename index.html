@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Свидание?</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 20px;
+  }
+
+  .screen {
+    display: none;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px 30px;
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    max-width: 480px;
+    width: 100%;
+    animation: fadeIn 0.5s ease;
+  }
+
+  .screen.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  h1 {
+    font-size: 26px;
+    color: #333;
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+
+  p.subtitle {
+    color: #777;
+    font-size: 15px;
+    margin-bottom: 28px;
+  }
+
+  .btn {
+    border: none;
+    padding: 14px 36px;
+    font-size: 17px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.25s ease;
+    margin: 8px;
+  }
+
+  .btn-yes {
+    background: linear-gradient(135deg, #ff6b9d, #ff4757);
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(255, 71, 87, 0.4);
+  }
+
+  .btn-yes:hover {
+    transform: scale(1.08);
+    box-shadow: 0 12px 28px rgba(255, 71, 87, 0.55);
+  }
+
+  .btn-no {
+    background: #e0e0e0;
+    color: #555;
+    position: relative;
+    transition: transform 0.25s ease;
+  }
+
+  .btn-next {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(118, 75, 162, 0.4);
+  }
+
+  .btn-next:hover {
+    transform: scale(1.05);
+  }
+
+  .buttons-wrap {
+    position: relative;
+    min-height: 120px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+  }
+
+  input[type="date"],
+  input[type="time"] {
+    width: 100%;
+    padding: 14px;
+    margin: 8px 0;
+    border: 2px solid #eee;
+    border-radius: 12px;
+    font-size: 16px;
+    outline: none;
+    transition: border 0.2s;
+  }
+
+  input[type="date"]:focus,
+  input[type="time"]:focus {
+    border-color: #ff6b9d;
+  }
+
+  .food-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 20px 0;
+  }
+
+  .food-card {
+    padding: 18px 10px;
+    border: 2px solid #eee;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 15px;
+    background: #fff;
+    user-select: none;
+  }
+
+  .food-card:hover {
+    border-color: #ff6b9d;
+    transform: translateY(-3px);
+  }
+
+  .food-card.selected {
+    border-color: #ff4757;
+    background: #fff0f3;
+    box-shadow: 0 8px 20px rgba(255, 71, 87, 0.2);
+  }
+
+  .food-emoji {
+    font-size: 28px;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .final-emoji {
+    font-size: 64px;
+    margin-bottom: 16px;
+    animation: pulse 1.2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+  }
+
+  .summary {
+    background: #fff5f7;
+    border-radius: 16px;
+    padding: 18px;
+    margin: 16px 0;
+    color: #444;
+    font-size: 15px;
+    line-height: 1.7;
+    text-align: left;
+  }
+
+  .summary b { color: #ff4757; }
+</style>
+</head>
+<body>
+
+<!-- ЭКРАН 1 -->
+<div class="screen active" id="screen1">
+  <h1>Привет! ❤️</h1>
+  <p class="subtitle">Пойдёшь со мной на свидание?</p>
+  <div class="buttons-wrap">
+    <button class="btn btn-yes" onclick="goTo('screen2')">Да</button>
+    <button class="btn btn-no" id="noBtn">Нет</button>
+  </div>
+</div>
+
+<!-- ЭКРАН 2 -->
+<div class="screen" id="screen2">
+  <h1>Ура! 🎉</h1>
+  <p class="subtitle">Когда тебе удобно?</p>
+  <input type="date" id="dateInput">
+  <input type="time" id="timeInput">
+  <button class="btn btn-next" onclick="goTo('screen3')">Дальше</button>
+</div>
+
+<!-- ЭКРАН 3 -->
+<div class="screen" id="screen3">
+  <h1>Что будем есть? 🍽️</h1>
+  <p class="subtitle">Выбери, что тебе по душе</p>
+  <div class="food-grid" id="foodGrid">
+    <div class="food-card" data-food="Пицца">
+      <span class="food-emoji">🍕</span>Пицца
+    </div>
+    <div class="food-card" data-food="Суши">
+      <span class="food-emoji">🍣</span>Суши
+    </div>
+    <div class="food-card" data-food="Бургеры">
+      <span class="food-emoji">🍔</span>Бургеры
+    </div>
+    <div class="food-card" data-food="Паста">
+      <span class="food-emoji">🍝</span>Паста
+    </div>
+    <div class="food-card" data-food="Кофе и десерт">
+      <span class="food-emoji">☕</span>Кофе и десерт
+    </div>
+    <div class="food-card" data-food="Что-то другое">
+      <span class="food-emoji">✨</span>Другое
+    </div>
+  </div>
+  <button class="btn btn-next" onclick="finish()">Готово</button>
+</div>
+
+<!-- ЭКРАН 4 -->
+<div class="screen" id="screen4">
+  <div class="final-emoji">💖</div>
+  <h1>Договорились!</h1>
+  <p class="subtitle">Жду с нетерпением</p>
+  <div class="summary" id="summary"></div>
+  <button class="btn btn-yes" onclick="confettiBoom()">Отправить поцелуй 💋</button>
+</div>
+
+<script>
+  // --- Кнопка "Нет", которая убегает ---
+  const noBtn = document.getElementById('noBtn');
+  const wrap = noBtn.parentElement;
+
+  function moveNoBtn() {
+    const maxX = wrap.offsetWidth / 2 - noBtn.offsetWidth / 2;
+    const maxY = 60;
+    const x = (Math.random() * 2 - 1) * maxX;
+    const y = (Math.random() * 2 - 1) * maxY;
+    noBtn.style.transform = `translate(${x}px, ${y}px)`;
+  }
+
+  noBtn.addEventListener('mouseover', moveNoBtn);
+  noBtn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    moveNoBtn();
+  });
+  noBtn.addEventListener('click', moveNoBtn);
+
+  // --- Переключение экранов ---
+  function goTo(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  // --- Выбор еды ---
+  let selectedFood = '';
+  document.querySelectorAll('.food-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.food-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedFood = card.dataset.food;
+    });
+  });
+
+  // --- Финальный экран ---
+  function finish() {
+    const date = document.getElementById('dateInput').value;
+    const time = document.getElementById('timeInput').value;
+
+    if (!date || !time) {
+      alert('Выбери дату и время 😊');
+      return;
+    }
+    if (!selectedFood) {
+      alert('Выбери, что будем есть 😊');
+      return;
+    }
+
+    const d = new Date(date);
+    const dateStr = d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    document.getElementById('summary').innerHTML = `
+      📅 <b>Дата:</b> ${dateStr}<br>
+      ⏰ <b>Время:</b> ${time}<br>
+      🍽️ <b>Еда:</b> ${selectedFood}
+    `;
+
+    goTo('screen4');
+    confettiBoom();
+  }
+
+  // --- Простое конфетти без библиотек ---
+  function confettiBoom() {
+    const colors = ['#ff6b9d', '#ff4757', '#667eea', '#764ba2', '#ffd93d', '#6bcb77'];
+    for (let i = 0; i < 60; i++) {
+      const el = document.createElement('div');
+      el.style.position = 'fixed';
+      el.style.width = '10px';
+      el.style.height = '10px';
+      el.style.background = colors[Math.floor(Math.random() * colors.length)];
+      el.style.left = Math.random() * 100 + 'vw';
+      el.style.top = '-20px';
+      el.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+      el.style.zIndex = '9999';
+      el.style.pointerEvents = 'none';
+      el.style.transition = 'transform 3s linear, opacity 3s linear';
+      document.body.appendChild(el);
+
+      const xDrift = (Math.random() - 0.5) * 400;
+      const yDrift = window.innerHeight + 100;
+
+      requestAnimationFrame(() => {
+        el.style.transform = `translate(${xDrift}px, ${yDrift}px) rotate(${Math.random() * 720}deg)`;
+        el.style.opacity = '0';
+      });
+
+      setTimeout(() => el.remove(), 3200);
+    }
+  }
+</script>
+
+</body>
+</html>
